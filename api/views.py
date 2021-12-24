@@ -1,6 +1,7 @@
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework import status
 from django.utils import timezone
 from rest_framework.mixins import (
     RetrieveModelMixin,
@@ -34,6 +35,8 @@ class StartStopModelMixin(GenericViewSet):
     @action(detail=True, methods=['post'])
     def start(self, request, *args, **kwargs):
         item = self.get_object()
+        if item.started:
+            return Response({'started': 'Already set'}, status=status.HTTP_400_BAD_REQUEST)
         item.started = timezone.now()
         item.save()
         serializer = self.get_serializer(item)
@@ -42,6 +45,8 @@ class StartStopModelMixin(GenericViewSet):
     @action(detail=True, methods=['post'])
     def finish(self, request, *args, **kwargs):
         item = self.get_object()
+        if item.finished:
+            return Response({'finished': 'Already set'}, status=status.HTTP_400_BAD_REQUEST)
         item.finished = timezone.now()
         item.save()
         serializer = self.get_serializer(item)
