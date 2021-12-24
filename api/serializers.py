@@ -11,22 +11,26 @@ from .models import (
 class TestInstanceSerializer(ModelSerializer):
     class Meta:
         model = TestInstance
-        fields = ['pk', 'name', 'description']
+        fields = '__all__'
+        read_only_fields = ['id']
 
 
 class TestBuildSerializer(ModelSerializer):
     class Meta:
         model = TestBuild
-        fields = ['pk', 'number', 'started', 'finished']
+        fields = '__all__'
+        read_only_fields = ['id', 'started', 'finished', 'test_instance']
 
 
 class TestSuiteSerializer(ModelSerializer):
     class Meta:
         model = TestSuite
-        fields = ['pk', 'name', 'started', 'finished']
+        fields = '__all__'
+        read_only_fields = ['id', 'started', 'finished', 'test_build']
 
 
 class TestCaseSerializer(ModelSerializer):
     class Meta:
         model = TestCase
-        fields = ['pk', 'name', 'started', 'finished', 'result_status']
+        fields = '__all__'
+        read_only_fields = ['id', 'started', 'finished', 'test_suite']

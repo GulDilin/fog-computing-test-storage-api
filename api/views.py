@@ -59,21 +59,31 @@ class TestInstanceViewSet(ApiModelViewSet):
 
 
 class TestBuildViewSet(ApiModelViewSet, StartStopModelMixin):
+    serializer_class = TestBuildSerializer
+
     def get_queryset(self):
         return TestBuild.objects.filter(test_instance=self.kwargs.get('test_instance_pk'))
 
-    serializer_class = TestBuildSerializer
+    def perform_create(self, serializer):
+        serializer.save(test_instance=TestInstance.objects.get(pk=self.kwargs.get('test_instance_pk')))
 
 
 class TestSuiteViewSet(ApiModelViewSet, StartStopModelMixin):
+    serializer_class = TestSuiteSerializer
+
     def get_queryset(self):
         return TestSuite.objects.filter(test_build=self.kwargs.get('test_build_pk'))
 
-    serializer_class = TestSuiteSerializer
+    def perform_create(self, serializer):
+        serializer.save(test_build=TestBuild.objects.get(pk=self.kwargs.get('test_build_pk')))
 
 
 class TestCaseViewSet(ApiModelViewSet, StartStopModelMixin):
+    serializer_class = TestCaseSerializer
+
     def get_queryset(self):
         return TestCase.objects.filter(test_suite=self.kwargs.get('test_suite_pk'))
 
-    serializer_class = TestCaseSerializer
+    def perform_create(self, serializer):
+        serializer.save(test_suite=TestSuite.objects.get(pk=self.kwargs.get('test_suite_pk')))
+

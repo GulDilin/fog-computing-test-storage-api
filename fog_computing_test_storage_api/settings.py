@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-t)d4n&0a-5+3+jw$)i^p_09^#*m@8%($*5qdlhs_8%_-u$ond7
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 # Application definition
 
@@ -53,10 +53,13 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     # CORS
     'corsheaders.middleware.CorsMiddleware',
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "corsheaders.middleware.CorsPostCsrfMiddleware",
     'django.middleware.common.CommonMiddleware',
 ]
 
-CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_METHODS = ['GET', 'POST']
 
 ROOT_URLCONF = 'fog_computing_test_storage_api.urls'
 
@@ -81,24 +84,26 @@ WSGI_APPLICATION = 'fog_computing_test_storage_api.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+if 'RDS_HOSTNAME' in os.environ:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': os.environ['RDS_DB_NAME'],
+            'USER': os.environ['RDS_USERNAME'],
+            'PASSWORD': os.environ['RDS_PASSWORD'],
+            'HOST': os.environ['RDS_HOSTNAME'],
+            'PORT': os.environ['RDS_PORT'],
+        }
     }
-    # 'default': {
-    #     'ENGINE': os.environ.get('DB_ENGINE'),
-    #     'NAME': os.environ.get('DB_NAME'),
-    #     'USER': os.environ.get('DB_USER'),
-    #     'PASSWORD': os.environ.get('DB_PASS'),
-    #     'HOST': os.environ.get('DB_HOST'),
-    #     'PORT': os.environ.get('DB_PORT'),
-    #     # 'ENGINE': 'djongo',
-    #     # 'NAME': 'bezkoder_db',
-    #     # 'HOST': '127.0.0.1',
-    #     # 'PORT': 27017,
-    # }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': 'db.sqlite3',
+        }
+    }
+
+STATIC_ROOT="static"
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
